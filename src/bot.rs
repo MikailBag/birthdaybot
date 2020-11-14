@@ -1,3 +1,4 @@
+use chrono::Datelike;
 use teloxide::utils::command::BotCommand;
 use teloxide::{prelude::Request, types::UpdateKind};
 
@@ -83,6 +84,32 @@ pub(crate) async fn on_message(
     Ok(())
 }
 
+const SECS_PER_DAY: u64 = 24 * 60 * 60 + 100;
+
+#[tracing::instrument(skip(bot, db))]
 pub(crate) async fn greet(bot: teloxide::Bot, db: crate::db::Db) -> anyhow::Result<()> {
-    
+    let now = chrono::Utc::today();
+    let now_ts = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)?
+        .as_secs();
+    tracing::info!(
+        day = now.day(),
+        month = now.month(),
+        "searching for greeties"
+    );
+    let greeted = db
+        .select(
+            &now.day().to_string(),
+            &now.month().to_string(),
+            &now_ts.to_string(),
+        )
+        .await?;
+    for mut user in greeted {
+        bot.send_message(user.chat_id, format!("Happy birthday"))
+            .send()
+            .await?;
+        user.last_greeted_timestamp = now_ts + SECS_PER_DAY;
+        db.put(user).await?;
+    }
+    Ok(())
 }
