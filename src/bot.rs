@@ -38,9 +38,12 @@ pub(crate) async fn on_message(
         let cmd = match Command::parse(text, me) {
             Ok(c) => c,
             Err(e) => {
-                bot.send_message(msg.chat.id, format!("I did not understand you: {}", e))
-                    .send()
-                    .await?;
+                bot.send_message(
+                    msg.chat.id,
+                    format!("I did not understand you ({}). Try /help", e),
+                )
+                .send()
+                .await?;
                 return Ok(());
             }
         };
