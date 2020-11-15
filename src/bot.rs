@@ -7,6 +7,7 @@ use teloxide::{prelude::Request, types::UpdateKind};
 enum Command {
     #[command(description = "get some help")]
     Help,
+    Start,
     #[command(description = "/register DD.MM.YYYY (do not use trailing zeroes)")]
     Register(String),
 }
@@ -49,7 +50,7 @@ pub(crate) async fn on_message(
         };
         dbg!(&cmd);
         match cmd {
-            Command::Help => {
+            Command::Help | Command::Start => {
                 bot.send_message(msg.chat.id, Command::descriptions())
                     .send()
                     .await?;
