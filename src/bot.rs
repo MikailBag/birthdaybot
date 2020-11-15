@@ -20,6 +20,7 @@ fn parse_date(s: &str) -> Option<crate::models::Date> {
     let day = items[0].parse().ok()?;
     let month = items[1].parse().ok()?;
     let year = items[2].parse().ok()?;
+    chrono::NaiveDate::from_ymd_opt(year as _, month as _, day as _)?;
     Some(crate::models::Date { day, month, year })
 }
 
