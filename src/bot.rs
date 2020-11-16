@@ -121,7 +121,7 @@ pub(crate) async fn greet(bot: teloxide::Bot, db: crate::db::Db) -> anyhow::Resu
         )
         .await?;
     for mut user in greeted {
-        bot.send_message(user.chat_id, format!("Happy birthday"))
+        bot.send_message(user.chat_id, format!("Happy birthday, @{}", user.username))
             .send()
             .await?;
         user.last_greeted_timestamp = now_ts + SECS_PER_DAY;
