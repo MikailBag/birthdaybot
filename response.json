@@ -1,4 +1,1 @@
-{
-    "errorMessage": "RequestId: 5233b26d-4cbf-4e4a-afa3-81ed29b4b183 Error: Runtime exited without providing a reason",
-    "errorType": "Runtime.ExitError"
-}
+{"body":"greet done","isBase64Encoded":false,"statusCode":200}

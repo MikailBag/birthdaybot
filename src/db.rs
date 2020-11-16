@@ -46,7 +46,8 @@ impl Db {
         );
         let req = rusoto_dynamodb::ScanInput {
             filter_expression: Some(
-                "BirthDay = :BirthDay and BirthMonth = :BirthMonth and LastTs <= :LastTs".to_string(),
+                "BirthDay = :BirthDay and BirthMonth = :BirthMonth and LastTs <= :LastTs"
+                    .to_string(),
             ),
             table_name: self.table.to_string(),
             expression_attribute_values: Some(values),

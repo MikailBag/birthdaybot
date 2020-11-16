@@ -13,6 +13,7 @@ pub struct User {
     pub birth: Date,
     pub last_greeted_timestamp: u64,
     pub chat_id: i64,
+    pub username: String,
 }
 
 impl User {
@@ -60,6 +61,13 @@ impl User {
                 ..Default::default()
             },
         );
+        m.insert(
+            "UserName".to_string(),
+            AttributeValue {
+                s: Some(self.username.to_string()),
+                ..Default::default()
+            },
+        );
 
         m
     }
@@ -95,6 +103,12 @@ impl User {
             .and_then(|x| x.s.as_ref())
             .context("ChatId missing")?
             .parse()?;
+        let username = m
+            .get("UserName")
+            .and_then(|x| x.s.as_ref())
+            .cloned()
+            .unwrap_or_else(|| "unknown".to_string());
+        // .context("UserName missing")?;
         Ok(User {
             id: user_id,
             chat_id,
@@ -104,6 +118,7 @@ impl User {
                 month: birth_month,
                 year: birth_year,
             },
+            username,
         })
     }
 }

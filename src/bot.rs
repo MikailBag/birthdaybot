@@ -72,11 +72,22 @@ pub(crate) async fn on_message(
                     }
                 };
 
+                let username = match msg.from().and_then(|u| u.username.clone()) {
+                    Some(s) => s,
+                    None => {
+                        bot.send_message(msg.chat.id, "You do not have username")
+                            .send()
+                            .await?;
+                        return Ok(());
+                    }
+                };
+
                 let user = crate::models::User {
                     id: user_id,
                     birth: date,
                     last_greeted_timestamp: 0,
                     chat_id: msg.chat.id,
+                    username,
                 };
 
                 db.put(user).await?;

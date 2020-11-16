@@ -159,7 +159,7 @@ async fn handler(
     let (status, body) = handler_inner(bot, db, &ev.request_context.http.path, &body)
         .await
         .map_err(|e| {
-            tracing::error!("Error: {err}", err=format_args!("{:#}", e));
+            tracing::error!("Error: {err}", err = format_args!("{:#}", e));
             e
         })?;
     Ok(serde_json::json!({
