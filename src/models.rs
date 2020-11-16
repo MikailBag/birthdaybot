@@ -5,7 +5,6 @@ use std::collections::HashMap;
 pub struct Date {
     pub day: u8,
     pub month: u8,
-    pub year: u16,
 }
 
 pub struct User {
@@ -37,13 +36,6 @@ impl User {
             "BirthMonth".to_string(),
             AttributeValue {
                 s: Some(self.birth.month.to_string()),
-                ..Default::default()
-            },
-        );
-        m.insert(
-            "BirthYear".to_string(),
-            AttributeValue {
-                s: Some(self.birth.year.to_string()),
                 ..Default::default()
             },
         );
@@ -88,11 +80,6 @@ impl User {
             .and_then(|x| x.s.as_ref())
             .context("BirthMonth missing")?
             .parse()?;
-        let birth_year = m
-            .get("BirthYear")
-            .and_then(|x| x.s.as_ref())
-            .context("BirthYear missing")?
-            .parse()?;
         let last_ts = m
             .get("LastTs")
             .and_then(|x| x.s.as_ref())
@@ -116,7 +103,6 @@ impl User {
             birth: Date {
                 day: birth_day,
                 month: birth_month,
-                year: birth_year,
             },
             username,
         })

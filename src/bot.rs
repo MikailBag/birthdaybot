@@ -8,20 +8,19 @@ enum Command {
     #[command(description = "get some help")]
     Help,
     Start,
-    #[command(description = "/register DD.MM.YYYY (do not use trailing zeroes)")]
+    #[command(description = "/register DD.MM (your birthday)")]
     Register(String),
 }
 
 fn parse_date(s: &str) -> Option<crate::models::Date> {
     let items = s.split('.').collect::<Vec<_>>();
-    if items.len() != 3 {
+    if items.len() != 2 {
         return None;
     }
     let day = items[0].parse().ok()?;
     let month = items[1].parse().ok()?;
-    let year = items[2].parse().ok()?;
-    chrono::NaiveDate::from_ymd_opt(year as _, month as _, day as _)?;
-    Some(crate::models::Date { day, month, year })
+    chrono::NaiveDate::from_ymd_opt(2016, month as _, day as _)?;
+    Some(crate::models::Date { day, month })
 }
 
 pub(crate) async fn on_message(
@@ -40,12 +39,6 @@ pub(crate) async fn on_message(
         let cmd = match Command::parse(text, me) {
             Ok(c) => c,
             Err(e) => {
-                bot.send_message(
-                    msg.chat.id,
-                    format!("I did not understand you ({}). Try /help", e),
-                )
-                .send()
-                .await?;
                 return Ok(());
             }
         };
