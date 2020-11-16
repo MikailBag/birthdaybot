@@ -175,18 +175,6 @@ async fn main() -> anyhow::Result<()> {
     println!("Using token: {}...", &token[..6]);
     let bot = teloxide::Bot::builder().token(token).build();
 
-    /*if std::env::var("DBG").is_ok() {
-        println!("debugging");
-
-        let client = reqwest::Client::builder().build()?;
-        let res = client.post("https://api.telegram.org/kek").send().await;
-        dbg!(res);
-
-        let res = bot.get_me().send().await;
-        dbg!(res);
-
-        return Ok(());
-    }*/
     let db = db::Db::connect()
         .await
         .context("failed to create db client")?;

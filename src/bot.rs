@@ -42,7 +42,6 @@ pub(crate) async fn on_message(
                 return Ok(());
             }
         };
-        dbg!(&cmd);
         match cmd {
             Command::Help | Command::Start => {
                 bot.send_message(msg.chat.id, Command::descriptions())
