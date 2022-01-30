@@ -8,7 +8,7 @@ pub struct Date {
 }
 
 pub struct User {
-    pub id: i32,
+    pub id: i64,
     pub birth: Date,
     pub last_greeted_timestamp: u64,
     pub chat_id: i64,

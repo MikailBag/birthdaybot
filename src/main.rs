@@ -5,7 +5,7 @@ mod models;
 use anyhow::Context;
 use futures_util::StreamExt;
 use rusoto_ssm::Ssm;
-use teloxide::prelude::Request;
+use teloxide::{prelude::{Request, Requester}, dispatching::update_listeners::AsUpdateStream};
 
 async fn get_token() -> anyhow::Result<String> {
     match tokio::fs::read_to_string("./tg-token").await {
@@ -108,7 +108,7 @@ async fn handler_inner(
             .set_webhook(format!(
                 "https://r3wfwomtd1.execute-api.us-east-1.amazonaws.com{}",
                 path_webhook
-            ))
+            ).parse().context("invalid url")?)
             .send()
             .await
         {
@@ -173,7 +173,7 @@ async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt().init();
     let token = get_token().await?;
     println!("Using token: {}...", &token[..6]);
-    let bot = teloxide::Bot::builder().token(token).build();
+    let bot = teloxide::Bot::new(token);
 
     let db = db::Db::connect()
         .await
@@ -181,7 +181,8 @@ async fn main() -> anyhow::Result<()> {
 
     if std::env::var("LOCAL").is_ok() {
         println!("local launch");
-        let updates = teloxide::dispatching::update_listeners::polling_default(bot.clone());
+        let mut updates = teloxide::dispatching::update_listeners::polling_default(bot.clone()).await;
+        let updates = updates.as_stream();
         tokio::pin!(updates);
         while let Some(update) = updates.next().await {
             bot::on_message(
@@ -193,7 +194,7 @@ async fn main() -> anyhow::Result<()> {
         }
         return Ok(());
     }
-    lambda::run(lambda::handler_fn(move |upd, _cx| {
+    lambda_runtime::run(lambda_runtime::handler_fn(move |upd, _cx| {
         handler(upd, bot.clone(), db.clone())
     }))
     .await

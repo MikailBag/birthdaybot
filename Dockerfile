@@ -1,10 +1,13 @@
-FROM ekidd/rust-musl-builder
+FROM rust:1.58.1-slim as builder
 
 WORKDIR /app
 
-ADD --chown=rust:rust Cargo.toml Cargo.lock /app/
-RUN mkdir src && echo 'fn main(){}' > src/main.rs
-RUN cargo build --release
-ADD --chown=rust:rust src /app/src
+ADD . /app/
 
-RUN cargo build --release
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/app/target \
+    cargo build --release
+
+FROM gcr.io/distroless/cc
+COPY --from=builder /app/target/release/birthdaybot  /usr/local/bin/bot
+ENTRYPOINT [ "/usr/local/bin/bot" ]

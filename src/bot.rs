@@ -1,6 +1,6 @@
 use chrono::Datelike;
 use teloxide::utils::command::BotCommand;
-use teloxide::{prelude::Request, types::UpdateKind};
+use teloxide::{prelude::{Requester, Request}, types::UpdateKind};
 
 #[derive(Debug, BotCommand)]
 #[command(rename = "lowercase", parse_with = "split")]
@@ -26,7 +26,7 @@ fn parse_date(s: &str) -> Option<crate::models::Date> {
 pub(crate) async fn on_message(
     bot: teloxide::Bot,
     db: crate::db::Db,
-    update: teloxide::prelude::Update,
+    update: teloxide::types::Update,
 ) -> anyhow::Result<()> {
     let msg = match update.kind {
         UpdateKind::Message(m) => m,
@@ -38,7 +38,7 @@ pub(crate) async fn on_message(
     if let Some(text) = msg.text() {
         let cmd = match Command::parse(text, me) {
             Ok(c) => c,
-            Err(e) => {
+            Err(_) => {
                 return Ok(());
             }
         };
