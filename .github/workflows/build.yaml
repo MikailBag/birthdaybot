@@ -1,0 +1,34 @@
+name: "CI & CD"
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker build -t bot .
+        env:
+          DOCKER_BUILDKIT: '1'
+      - run: docker save bot > bot.tgz
+      - uses: actions/upload-artifact@v2
+        with:
+          name: bot
+          path: bot.tgz
+  push:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/')
+    needs: 
+      - build
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: bot
+          path: bot
+      - run: docker load --input bot/bot.tgz
+      - run: |
+          echo "${YC_KEY}" | docker login --username json_key --password-stdin cr.yandex
+        env:
+          YC_KEY: ${{ secrets.YC_SA_AUTHKEY }} 
+      - run: |
+          name=cr.yandex/crpepnp6t24n31l71vv9/birthdaybot:dev
+          docker tag bot $name
+          docker push $name
